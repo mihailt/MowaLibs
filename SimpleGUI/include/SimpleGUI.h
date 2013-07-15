@@ -36,9 +36,9 @@ using namespace ci;
 using namespace ci::app;
 
 namespace mowa { namespace sgui {
-	
+
 //-----------------------------------------------------------------------------
-	
+
 class Control;
 class FloatVarControl;
 class IntVarControl;
@@ -50,7 +50,7 @@ class ColumnControl;
 class PanelControl;
 class TextureVarControl;
 class ColorVarControl;
-	
+
 //-----------------------------------------------------------------------------
 
 class SimpleGUI {
@@ -59,12 +59,10 @@ private:
 	Vec2f	mousePos;
 	std::vector<Control*> controls;
 	Control* selectedControl;
-	
-	CallbackId	cbMouseDown;
-	CallbackId	cbMouseUp;
-	CallbackId  cbMouseDrag;	
 
-	void	init(App* app);	
+    ci::signals::scoped_connection  cbMouseDown, cbMouseUp, cbMouseDrag;
+
+	void	init(App* app);
 public:
 	static ColorA darkColor;
 	static ColorA lightColor;
@@ -76,7 +74,7 @@ public:
 	static Vec2f labelSize;
 	static Vec2f separatorSize;
 	static Font textFont;
-	
+
 	enum {
 		RGB,
 		HSV
@@ -84,17 +82,17 @@ public:
 public:
 	SimpleGUI(App* app);
 	bool	isSelected() { return selectedControl != NULL; }
-	std::vector<Control*>& getControls() { return controls; }	
-	
+	std::vector<Control*>& getControls() { return controls; }
+
 	bool	onMouseDown(MouseEvent event);
 	bool	onMouseUp(MouseEvent event);
 	bool	onMouseDrag(MouseEvent event);
-	
+
 	void	draw();
 	void	dump();
 	void	save(std::string fileName = "");
 	void	load(std::string fileName = "");
-	
+
 	bool	isEnabled();
 	void	setEnabled(bool state);
 
@@ -103,22 +101,22 @@ public:
 	BoolVarControl*		addParam(const std::string& paramName, bool* var, bool defaultValue = false, int groupId = -1);
 	ColorVarControl*	addParam(const std::string& paramName, ColorA* var, ColorA const defaultValue = ColorA(0, 1, 1, 1), int colorModel = RGB);
 	TextureVarControl*	addParam(const std::string& paramName, gl::Texture* var, int scale = 1, bool flipVert = false);
-	
+
 	ButtonControl*		addButton(const std::string& buttonName);
-	LabelControl*		addLabel(const std::string& labelName);	
-	SeparatorControl*	addSeparator();	
-	ColumnControl*		addColumn(int x = 0, int y = 0);	
+	LabelControl*		addLabel(const std::string& labelName);
+	SeparatorControl*	addSeparator();
+	ColumnControl*		addColumn(int x = 0, int y = 0);
 	PanelControl*		addPanel();
-	
+
 	Control*			getControlByName(const std::string& name);
-	
-	static Vec2f		getStringSize(const std::string& str);		
+
+	static Vec2f		getStringSize(const std::string& str);
 	static Rectf		getScaledWidthRectf(Rectf rect, float scale);
 };
-	
+
 //-----------------------------------------------------------------------------
-	
-	
+
+
 class Control {
 public:
 	enum Type {
@@ -133,17 +131,17 @@ public:
 		COLUMN,
 		PANEL
 	};
-	
+
 	Vec2f	position;
 	Rectf	activeArea;
 	ColorA	bgColor;
 	Type	type;
 	std::string name;
 	SimpleGUI* parentGui;
-	
-	Control();	
+
+	Control();
 	virtual ~Control() {};
-	void setBackgroundColor(ColorA color);	
+	void setBackgroundColor(ColorA color);
 	void notifyUpdateListeners();
 	virtual Vec2f draw(Vec2f pos) = 0;
 	virtual std::string toString() { return ""; };
@@ -152,11 +150,11 @@ public:
 	virtual void onMouseUp(MouseEvent event) {};
 	virtual void onMouseDrag(MouseEvent event) {};
 };
-	
+
 //-----------------------------------------------------------------------------
 
 class FloatVarControl : public Control {
-public:	
+public:
 	float* var;
 	float min;
 	float max;
@@ -167,12 +165,12 @@ public:
 	Vec2f draw(Vec2f pos);
 	std::string toString();
 	void fromString(std::string& strValue);
-	void onMouseDown(MouseEvent event);	
+	void onMouseDown(MouseEvent event);
 	void onMouseDrag(MouseEvent event);
 };
-	
+
 //-----------------------------------------------------------------------------
-	
+
 class IntVarControl : public Control {
 public:
 	int* var;
@@ -183,12 +181,12 @@ public:
 	float getNormalizedValue();
 	void setNormalizedValue(float value);
 	Vec2f draw(Vec2f pos);
-	std::string toString();	
+	std::string toString();
 	void fromString(std::string& strValue);
-	void onMouseDown(MouseEvent event);	
-	void onMouseDrag(MouseEvent event);	
+	void onMouseDown(MouseEvent event);
+	void onMouseDrag(MouseEvent event);
 };
-	
+
 //-----------------------------------------------------------------------------
 
 class BoolVarControl : public Control {
@@ -197,12 +195,12 @@ public:
 	int groupId;
 public:
 	BoolVarControl(const std::string& name, bool* var, bool defaultValue, int groupId);
-	Vec2f draw(Vec2f pos);	
-	std::string toString();	
+	Vec2f draw(Vec2f pos);
+	std::string toString();
 	void fromString(std::string& strValue);
 	void onMouseDown(MouseEvent event);
 };
-	
+
 //-----------------------------------------------------------------------------
 
 class ColorVarControl : public Control {
@@ -211,7 +209,7 @@ public:
 	Rectf	activeArea1;
 	Rectf	activeArea2;
 	Rectf	activeArea3;
-	Rectf	activeArea4;	
+	Rectf	activeArea4;
 	int		activeTrack;
 	int		colorModel;
 public:
@@ -219,10 +217,10 @@ public:
 	Vec2f draw(Vec2f pos);
 	std::string toString();	//saved as "r g b a"
 	void fromString(std::string& strValue); //expecting "r g b a"
-	void onMouseDown(MouseEvent event);	
+	void onMouseDown(MouseEvent event);
 	void onMouseDrag(MouseEvent event);
 };
-	
+
 //-----------------------------------------------------------------------------
 
 class ButtonControl : public Control {
@@ -248,20 +246,20 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-	
+
 class LabelControl : public Control {
 public:
 	LabelControl(const std::string& name);
 	void setText(const std::string& text);
-	Vec2f draw(Vec2f pos);	
+	Vec2f draw(Vec2f pos);
 };
-	
+
 //-----------------------------------------------------------------------------
-	
+
 class SeparatorControl : public Control {
 public:
 	SeparatorControl();
-	Vec2f draw(Vec2f pos);	
+	Vec2f draw(Vec2f pos);
 };
 
 //-----------------------------------------------------------------------------
@@ -271,18 +269,18 @@ public:
 	int x;
 	int y;
 	ColumnControl(int x = 0, int y = 0);
-	Vec2f draw(Vec2f pos);	
-}; 
-	
+	Vec2f draw(Vec2f pos);
+};
+
 //-----------------------------------------------------------------------------
- 
+
 class PanelControl : public Control {
 public:
 	bool enabled;
 	PanelControl();
 	Vec2f draw(Vec2f pos);
 };
-	
+
 
 //-----------------------------------------------------------------------------
 
@@ -290,11 +288,11 @@ class TextureVarControl : public Control {
 public:
 	gl::Texture* var;
 	float scale;
-	bool flipVert;	
+	bool flipVert;
 	TextureVarControl(const std::string& name, gl::Texture* var, int scale, bool flipVert = false);
-	Vec2f draw(Vec2f pos);	
+	Vec2f draw(Vec2f pos);
 };
-		
+
 //-----------------------------------------------------------------------------
 
 } //namespace sgui
